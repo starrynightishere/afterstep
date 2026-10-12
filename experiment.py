@@ -22,6 +22,12 @@ def compare(data, example_index, query, changes, steps=1000,
         predicted_change = sensitivity * change
         actual_change = predict(updated, query) - baseline
         rows.append({
+            "seed": seed,
+            "steps": steps,
+            "learning_rate": learning_rate,
+            "example_index": example_index,
+            "query_x0": query[0],
+            "query_x1": query[1],
             "weight_change": change,
             "predicted_change": predicted_change,
             "actual_change": actual_change,
@@ -40,7 +46,11 @@ def main(output="influence.csv"):
     ]
     changes = [-1.0, -0.5, -0.1, -0.01, -0.001, 0.0,
                0.001, 0.01, 0.1, 0.5, 1.0]
-    rows = compare(data, 1, (0.0, 1.0), changes)
+    rows = []
+    for seed in (0, 7, 19):
+        for steps in (10, 100, 1000):
+            rows.extend(compare(data, 1, (0.0, 1.0), changes,
+                                steps=steps, seed=seed))
 
     with open(output, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=rows[0].keys())
