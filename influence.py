@@ -27,6 +27,16 @@ def one_step_influence(data, example_index, query, learning_rate=0.1,
 
 def training_influence(data, example_index, query, steps=3000,
                        learning_rate=0.1, seed=7, sample_weights=None):
+    params, sensitivity = training_sensitivity(
+        data, example_index, steps, learning_rate, seed, sample_weights
+    )
+    return sum(
+        g * s for g, s in zip(prediction_gradients(params, query), sensitivity)
+    )
+
+
+def training_sensitivity(data, example_index, steps=3000,
+                         learning_rate=0.1, seed=7, sample_weights=None):
     validate_settings(steps, learning_rate)
     params = train(data, steps=0, seed=seed, sample_weights=sample_weights)
     validate_index(example_index, len(data))
@@ -56,6 +66,4 @@ def training_influence(data, example_index, query, steps=3000,
             for s, change in zip(sensitivity, total_change)
         ]
 
-    return sum(
-        g * s for g, s in zip(prediction_gradients(params, query), sensitivity)
-    )
+    return params, sensitivity
