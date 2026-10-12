@@ -4,7 +4,15 @@ from random import Random
 from network import gradients
 
 
+def validate_settings(steps, learning_rate):
+    if isinstance(steps, bool) or not isinstance(steps, int) or steps < 0:
+        raise ValueError("steps must be a nonnegative integer")
+    if not isfinite(learning_rate) or learning_rate < 0:
+        raise ValueError("learning rate must be finite and nonnegative")
+
+
 def train(data, steps=3000, learning_rate=0.1, seed=7, sample_weights=None):
+    validate_settings(steps, learning_rate)
     if not data:
         raise ValueError("data must not be empty")
     if sample_weights is None:

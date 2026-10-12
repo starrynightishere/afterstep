@@ -1,12 +1,18 @@
 from network import gradients, hessian_vector_product, prediction_gradients
-from train_xor import train
+from train_xor import train, validate_settings
+
+
+def validate_index(example_index, size):
+    if isinstance(example_index, bool) or not isinstance(example_index, int):
+        raise TypeError("example index must be an integer")
+    if not 0 <= example_index < size:
+        raise IndexError("example index is out of range")
 
 
 def one_step_influence(data, example_index, query, learning_rate=0.1,
                        seed=7, sample_weights=None):
     initial = train(data, steps=0, seed=seed, sample_weights=sample_weights)
-    if not 0 <= example_index < len(data):
-        raise IndexError("example index is out of range")
+    validate_index(example_index, len(data))
 
     updated = train(data, steps=1, learning_rate=learning_rate,
                     seed=seed, sample_weights=sample_weights)
@@ -21,9 +27,9 @@ def one_step_influence(data, example_index, query, learning_rate=0.1,
 
 def training_influence(data, example_index, query, steps=3000,
                        learning_rate=0.1, seed=7, sample_weights=None):
+    validate_settings(steps, learning_rate)
     params = train(data, steps=0, seed=seed, sample_weights=sample_weights)
-    if not 0 <= example_index < len(data):
-        raise IndexError("example index is out of range")
+    validate_index(example_index, len(data))
     if sample_weights is None:
         sample_weights = [1.0] * len(data)
     sensitivity = [0.0] * len(params)
