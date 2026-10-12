@@ -1,4 +1,4 @@
-from neuron import gradients, loss, predict
+from neuron import gradients, loss
 
 
 def mean_loss(weight, bias, data):
@@ -24,21 +24,12 @@ def main():
     bias = 0.0
     learning_rate = 0.1
 
-    print("step  weight    bias      mean loss")
-    print(f"{0:4d}  {weight:.6f}  {bias:.6f}  {mean_loss(weight, bias, data):.3e}")
-
-    for step in range(1, 101):
+    for _ in range(100):
         d_weight, d_bias = mean_gradients(weight, bias, data)
         weight -= learning_rate * d_weight
         bias -= learning_rate * d_bias
 
-        if step == 1 or step % 10 == 0:
-            print(
-                f"{step:4d}  {weight:.6f}  {bias:.6f}  "
-                f"{mean_loss(weight, bias, data):.3e}"
-            )
-
-    print(f"\nAt x=3: prediction={predict(weight, bias, 3.0):.6f}, expected=7")
+    return weight, bias
 
 
 if __name__ == "__main__":
