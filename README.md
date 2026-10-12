@@ -29,8 +29,3 @@ Check the gradients and influence calculation against finite differences:
 ```sh
 python3 -m unittest
 ```
-
-Related reading: Bae et al., [Training Data Attribution via Approximate Unrolled
-Differentiation](https://arxiv.org/abs/2405.12186) (2024). This project follows
-each gradient-descent update directly; it does not implement the paper's SOURCE
-approximation.
