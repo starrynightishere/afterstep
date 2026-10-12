@@ -34,7 +34,7 @@ def summarize(rows):
 
 def draw(rows, summary, output):
     fig, axes = plt.subplots(2, 2, figsize=(12, 9), layout="constrained")
-    fig.suptitle("How well does example influence predict retraining?", fontsize=16)
+    fig.suptitle("Influence and retraining", fontsize=16)
     colors = ("#8b9ba7", "#3986a3", "#16675f")
 
     for column, dataset in enumerate(("xor", "regression")):
@@ -51,26 +51,26 @@ def draw(rows, summary, output):
         ax = axes[0, column]
         heatmap = ax.imshow(matrix, cmap="RdBu_r", vmin=-limit, vmax=limit, aspect="auto")
         ax.set(xticks=examples, yticks=queries, yticklabels=[coordinates[q] for q in queries],
-               xlabel="training example index", ylabel="unseen query (x, y)",
+               xlabel="training example", ylabel="unseen query (x, y)",
                title=f"{dataset.upper() if dataset == 'xor' else 'Smooth regression'}\n"
-                     "sensitivity · seed 7 · 1,000 updates")
-        fig.colorbar(heatmap, ax=ax, shrink=0.8, label="prediction derivative w.r.t. example weight")
+                     "seed 7, 1,000 steps")
+        fig.colorbar(heatmap, ax=ax, shrink=0.8, label="sensitivity to example weight")
 
         ax = axes[1, column]
         for steps, color in zip((10, 100, 1000), colors):
             group = [r for r in summary if r["dataset"] == dataset and r["steps"] == steps]
             magnitudes = [r["weight_change_magnitude"] for r in group]
             ax.loglog(magnitudes, [r["mean_absolute_error"] for r in group],
-                      "o-", color=color, label=f"{steps:,} updates")
+                      "o-", color=color, label=f"{steps:,} steps")
             if steps == 1000:
                 ax.loglog(magnitudes, [r["no_change_mean_absolute_error"] for r in group],
-                          "--", color="#a66842", label="no-change baseline (1,000)")
-        ax.set(xlabel="absolute example-weight change", ylabel="mean absolute prediction-change error",
-               title="Approximation error across all examples and queries")
+                          "--", color="#a66842", label="no change (1,000 steps)")
+        ax.set(xlabel="|weight change|", ylabel="mean absolute error",
+               title="Estimate error")
         ax.grid(True, which="major", alpha=0.2)
         ax.legend(fontsize=8)
 
-    fig.supxlabel("Errors average both change signs and all three seeds. Heatmap scales differ by dataset.",
+    fig.supxlabel("Mean errors over 3 seeds and both signs. Heatmap scales differ.",
                   fontsize=10)
     fig.savefig(output / "influence.png", dpi=180)
     plt.close(fig)

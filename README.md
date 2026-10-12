@@ -34,7 +34,10 @@ python3 -m unittest
 
 ## results
 
-[Plots, measurements and setup](results/README.md).
+[Plot](results/influence.png) · [Summary](results/summary.csv)
+
+Small weight changes track retraining closely. Large changes can miss badly,
+especially when an example's weight is set to zero.
 
 To regenerate the figure and summary after running the experiment:
 
